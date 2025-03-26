@@ -13,14 +13,11 @@ import NotFound from "./pages/NotFound";
 import "./index.css";
 import Notices from "./pages/Notices";
 import FAQ from "./pages/FAQ";
-import { usePetitionStore } from "./store/usePetitionStore";
+import EditPetition from "./pages/EditPetition";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  const { petitions, fetchPetitions } = usePetitionStore();
-  if (petitions.length === 0) fetchPetitions();
-
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
@@ -33,8 +30,9 @@ const App = () => {
               <Route path="/petitions" element={<PetitionList />} />
               <Route path="/petitions/:id" element={<PetitionDetail />} />
               <Route path="/petitions/create" element={<CreatePetition />} />
-              <Route path="/notices" element={<Notices />} />
+              <Route path="/petitions/edit/:id" element={<EditPetition />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/notices" element={<Notices />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

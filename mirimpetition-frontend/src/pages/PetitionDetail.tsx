@@ -1,13 +1,17 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { 
+  AlertTriangle,
   Calendar, 
   CheckCircle, 
   Clock, 
+  Edit,
   FileText, 
+  Flag,
   MessageSquare, 
   Share2, 
-  ThumbsUp, 
+  ThumbsUp,
+  Trash2,
   Users 
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -16,21 +20,58 @@ import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { StatusBadge } from "@/components/StatusBadge";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription,
+  DialogFooter,
+  DialogHeader, 
+  DialogTitle,
+  DialogClose
+} from "@/components/ui/dialog";
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { StatusBadge, StatusType } from "@/components/StatusBadge";
 import { Layout } from "@/components/Layout";
 import { useToast } from "@/hooks/use-toast";
-import { Petition, usePetitionStore } from "@/store/usePetitionStore";
+import { Petition, Report, usePetitionStore } from "@/store/usePetitionStore";
 import NotFound from "./NotFound";
 import RelatedPetitionCard from "@/components/RelatedPetitionCard";
 
 const PetitionDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const { petitions, addSign } = usePetitionStore();
+  const navigate = useNavigate();
+  const { petitions, addSign, reportPetition, deletePetition } = usePetitionStore();
   const [hasSigned, setHasSigned] = useState(false);
   const [showSignConfirmation, setShowSignConfirmation] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState("");
   const { toast } = useToast();
+  
   const petition = petitions.find((p) => p.id === id);
+  
+  const currentUser = {
+    name: "김미림",
+    id: "user-123",
+    isAuthor: petition?.author.name === "김미림", 
+    isAdmin: false
+  };
+  
+  useEffect(() => {
+    setHasSigned(false);
+  }, [id]);
+  
   if (!petition) {
     return <NotFound />;
   }
@@ -53,9 +94,51 @@ const PetitionDetail = () => {
     });
   };
   
-  const progressPercentage = (petition.signatures / petition.goal) * 100;
+  const handleReport = () => {
+    if (!reportReason.trim()) {
+      toast({
+        title: "신고 이유를 입력해주세요",
+        description: "신고 이유는 반드시 입력해야 합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const newReport: Report = {
+      id: Math.random().toString(36).substr(2, 9),
+      reason: reportReason,
+      reportedAt: new Date().toISOString().split('T')[0].replace(/-/g, '.'),
+      reportedBy: currentUser.id,
+      status: 'pending'
+    };
+    
+    reportPetition(petition.id!, newReport);
+    setReportReason("");
+    setShowReportDialog(false);
+    
+    toast({
+      title: "청원이 신고되었습니다",
+      description: "신고 내용은 관리자가 검토 후 조치할 예정입니다.",
+    });
+  };
   
-  const deadlineDate = new Date(petition.deadline.replace(/\./g, '-'));
+  const handleEdit = () => {
+    navigate(`/petitions/edit/${petition.id}`);
+  };
+  
+  const handleDelete = () => {
+    deletePetition(petition.id!);
+    navigate('/petitions');
+    
+    toast({
+      title: "청원이 삭제되었습니다",
+      description: "청원이 성공적으로 삭제되었습니다.",
+    });
+  };
+  
+  const progressPercentage = ((petition.signatures ?? 0) / (petition.goal ?? 1)) * 100;
+  
+  const deadlineDate = new Date((petition.deadline ?? "").replace(/\./g, '-'));
   const today = new Date();
   const daysRemaining = Math.max(
     0,
@@ -72,11 +155,76 @@ const PetitionDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="flex items-center gap-2 mb-4">
-                <span className="px-3 py-1 text-xs font-medium rounded-full bg-secondary/80 text-foreground/80">
-                  {petition.category}
-                </span>
-                <StatusBadge status={petition.status} />
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 text-xs font-medium rounded-full bg-secondary/80 text-foreground/80">
+                    {petition.category}
+                  </span>
+                  <StatusBadge status={petition.status as StatusType} />
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  {(currentUser.isAuthor || currentUser.isAdmin) && (
+                    <>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-9 w-9 rounded-full" 
+                        onClick={handleEdit}
+                      >
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">수정</span>
+                      </Button>
+                      
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="h-9 w-9 rounded-full text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">삭제</span>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+                              <AlertTriangle className="h-5 w-5" />
+                              청원 삭제 확인
+                            </AlertDialogTitle>
+                            <AlertDialogDescription>
+                              정말로 이 청원을 삭제하시겠습니까? 이 작업은 되돌릴 수 없으며, 
+                              모든 서명과 의견이 영구적으로 삭제됩니다.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>취소</AlertDialogCancel>
+                            <AlertDialogAction 
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                              onClick={handleDelete}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              삭제
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </>
+                  )}
+                  
+                  {!currentUser.isAuthor && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-xs flex items-center gap-1"
+                      onClick={() => setShowReportDialog(true)}
+                    >
+                      <Flag className="h-3.5 w-3.5" />
+                      신고
+                    </Button>
+                  )}
+                </div>
               </div>
               
               <h1 className="text-3xl font-bold mb-4">{petition.title}</h1>
@@ -88,7 +236,7 @@ const PetitionDetail = () => {
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  <span>서명: {petition.signatures.toLocaleString()}명</span>
+                  <span>서명: {(petition.signatures ?? 0).toLocaleString()}명</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
@@ -104,7 +252,7 @@ const PetitionDetail = () => {
                 <div>
                   <p className="font-medium">{petition.author.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {petition.author.department} {petition.author.grade}학년
+                    {petition.author.major} {petition.author.grade}학년
                   </p>
                 </div>
               </div>
@@ -274,22 +422,25 @@ const PetitionDetail = () => {
               </div>
               
               <div className="p-6 rounded-xl bg-card/30 backdrop-blur-sm">
-                {!petition.relatedPetitions ? (
+                {!petition.relatedPetitions || petition.relatedPetitions.length === 0 ? (
                   <p className="text-muted-foreground text-center">관련 청원이 없습니다.</p>
                 ) : (
-                  <h3 className="text-lg font-bold mb-4">관련 청원</h3>
+                  <>
+                    <h3 className="text-lg font-bold mb-4">관련 청원</h3>
+                    <div className="space-y-4">
+                      {petition.relatedPetitions?.map((relatedPetition) => (
+                        <RelatedPetitionCard key={relatedPetition.id} petition={relatedPetition} />
+                      ))}
+                    </div>
+                  </>
                 )}
-                <div className="space-y-4">
-                  {petition.relatedPetitions?.map((relatedPetition) => (
-                    <RelatedPetitionCard key={relatedPetition.id} petition={relatedPetition} />
-                  ))}
-                </div>
               </div>
             </div>
           </motion.div>
         </div>
       </div>
       
+      {/* 서명 완료 다이얼로그 */}
       <Dialog open={showSignConfirmation} onOpenChange={setShowSignConfirmation}>
         <DialogContent className="sm:max-w-md glass">
           <DialogHeader>
@@ -310,6 +461,43 @@ const PetitionDetail = () => {
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* 신고 다이얼로그 */}
+      <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <Flag className="h-5 w-5" />
+              청원 신고하기
+            </DialogTitle>
+            <DialogDescription>
+              이 청원이 부적절하다고 생각하시는 이유를 알려주세요.
+              검토 후 적절한 조치가 취해질 것입니다.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="report-reason">신고 이유</Label>
+              <Textarea
+                id="report-reason"
+                placeholder="신고 이유를 구체적으로 작성해주세요."
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+                className="min-h-32"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">취소</Button>
+            </DialogClose>
+            <Button variant="destructive" onClick={handleReport}>
+              <Flag className="h-4 w-4 mr-2" />
+              신고하기
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </Layout>

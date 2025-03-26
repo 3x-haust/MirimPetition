@@ -33,7 +33,7 @@ const features = [
 const Index = () => {
   const { petitions } = usePetitionStore();
   const filteredPetitions = petitions
-    .sort((a, b) => b.signatures - a.signatures)
+    .sort((a, b) => (b.signatures ?? 0) - (a.signatures ?? 0))
     .slice(0, 4);
 
   return (
@@ -112,7 +112,7 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredPetitions.map((petition, index) => (
-              <PetitionCard key={index} {...petition} comments={petition.comments as Comment[] | undefined} id={petition.id as string}/>
+              <PetitionCard key={index} {...petition} id={petition.id ?? ""} />
             ))}
           </div>
         </div>
