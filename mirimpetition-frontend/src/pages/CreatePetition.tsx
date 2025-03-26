@@ -413,13 +413,9 @@ const CreatePetition = () => {
                       title: watchTitle,
                       category: watchCategory,
                       content: watchContent,
-                      status: 'pending',
-                      signatures: 0,
-                      goal: 300,
-                      deadline: new Date().toISOString(),
                       author: {
                         name: "김미림",
-                        department: "소프트웨어과",
+                        major: "소프트웨어과",
                         grade: 2,
                         avatar: "/placeholder.svg"
                       },

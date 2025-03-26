@@ -40,8 +40,7 @@ const PetitionList = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   const filteredPetitions = petitions.filter(petition => {
-    const matchesSearch = petition.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          (petition.excerpt ?? "").toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = petition.title.toLowerCase().includes(searchQuery.toLowerCase());
     
     const matchesTab = activeTab === "all" || 
                       (activeTab === "answered" && petition.status === "answered") ||
@@ -64,8 +63,6 @@ const PetitionList = () => {
       : petitions.length) / 9
   );
   
-
-  console.log(filteredPetitions);
 
   return (
     <Layout>
@@ -150,7 +147,7 @@ const PetitionList = () => {
         {filteredPetitions.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPetitions.map((petition) => (
-              <PetitionCard key={petition.id} {...petition} comments={petition.comments as Comment[] | undefined} id={petition.id as string}/>
+              <PetitionCard key={petition.id} {...petition} />
             ))}
           </div>
         ) : (
