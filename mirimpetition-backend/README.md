@@ -1,85 +1,94 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# MirimPetition Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+미림여자정보과학고등학교 청원 시스템 백엔드 서버입니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 기술 스택
 
-## Description
+- NestJS
+- TypeORM
+- PostgreSQL
+- Redis
+- JWT Authentication
+- Swagger API Documentation
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 시작하기
 
-## Project setup
+### 사전 요구사항
 
+- Node.js (v16 이상)
+- PostgreSQL
+- Redis
+- Yarn
+
+### 설치
+
+1. 저장소 클론
 ```bash
-$ yarn install
+git clone https://github.com/yourusername/mirimpetition-backend.git
+cd mirimpetition-backend
 ```
 
-## Compile and run the project
-
+2. 의존성 설치
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn install
 ```
 
-## Run tests
+3. 환경 변수 설정
+`.env` 파일을 생성하고 다음 내용을 추가합니다:
+```env
+# Database
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+DB_DATABASE=mirimpetition
 
-```bash
-# unit tests
-$ yarn run test
+# JWT
+JWT_SECRET=your-super-secret-key
+JWT_EXPIRATION=24h
 
-# e2e tests
-$ yarn run test:e2e
+# Redis
+REDIS_HOST=localhost
+REDIS_PORT=6379
 
-# test coverage
-$ yarn run test:cov
+# Server
+PORT=3000
+NODE_ENV=development
 ```
 
-## Resources
+4. 데이터베이스 생성
+```bash
+createdb mirimpetition
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### 실행
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+개발 모드:
+```bash
+yarn start:dev
+```
 
-## Support
+프로덕션 모드:
+```bash
+yarn build
+yarn start:prod
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## API 문서
 
-## Stay in touch
+Swagger UI를 통해 API 문서를 확인할 수 있습니다:
+http://localhost:3000/api
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 주요 기능
 
-## License
+- 사용자 인증 (회원가입, 로그인, 로그아웃)
+- 청원 작성, 조회, 수정, 삭제
+- 청원 투표 (찬성/반대)
+- 댓글 작성 및 관리
+- 공식 답변 작성
+- 알림 시스템
+- AI 기반 청원 분석 및 추천
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## 라이선스
+
+이 프로젝트는 MIT 라이선스를 따릅니다.
