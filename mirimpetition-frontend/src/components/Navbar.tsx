@@ -5,11 +5,13 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import { useMirimOAuth } from "mirim-oauth-react";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const { logIn, logOut, isLoggedIn } = useMirimOAuth();
 
   const toggleMenu = () => setIsOpen(!isOpen);
   
@@ -77,11 +79,22 @@ export function Navbar() {
             
             <ThemeToggle />
             
-            <Button asChild className="ml-2">
-              <Link to="/petitions/create">
-                청원하기
-              </Link>
-            </Button>
+            {isLoggedIn ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="hidden md:inline-flex"
+                onClick={() => {
+                  logOut();
+                }}
+              >
+                로그아웃
+              </Button>
+            ) : (
+              <Button onClick={logIn} className="ml-2">
+                로그인
+              </Button>
+            )}
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
