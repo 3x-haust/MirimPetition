@@ -40,6 +40,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Layout } from "@/components/Layout";
 import { useToast } from "@/hooks/use-toast";
 import { usePetitionStore } from "@/store/usePetitionStore";
+import { useMirimOAuth } from "mirim-oauth-react";
 
 const formSchema = z.object({
   title: z.string().min(5, {
@@ -66,7 +67,8 @@ const CreatePetition = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+  const { currentUser } = useMirimOAuth();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -413,14 +415,13 @@ const CreatePetition = () => {
                       title: watchTitle,
                       category: watchCategory,
                       content: watchContent,
-                      author: {
-                        name: "김미림",
-                        major: "소프트웨어과",
-                        grade: 2,
-                        avatar: "/placeholder.svg"
-                      },
-                    })}
-                  >
+		      author: {
+          	        name: currentUser?.nickname || "익명",
+         	 	major: currentUser?.major || "소프트웨어과",
+         	 	isTeacher: currentUser?.role === "teacher" || false,
+		      }
+		    })}
+		  >
                     {isSubmitting ? (
                       <>
                         <span className="animate-pulse">처리 중...</span>

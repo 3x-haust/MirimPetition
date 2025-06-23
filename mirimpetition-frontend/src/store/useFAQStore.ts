@@ -25,7 +25,7 @@ export const useFaqStore = create<FaqState>((set) => ({
     {
       id: '2',
       question: '청원이 채택되기 위한 최소 서명 수는 얼마인가요?',
-      answer: '청원이 학교 측의 공식 답변을 받기 위해서는 최소 300명의 서명이 필요합니다.',
+      answer: '청원이 학교 측의 공식 답변을 받기 위해서는 최소 60명의 서명이 필요합니다.',
       category: '서명 및 진행'
     },
     {
@@ -43,7 +43,7 @@ export const useFaqStore = create<FaqState>((set) => ({
     {
       id: '6',
       question: '청원 기간은 얼마나 되나요?',
-      answer: '청원은 등록일로부터 30일 동안 진행됩니다. 기간 내에 목표 서명 수를 달성하지 못하면 만료됩니다.',
+      answer: '청원은 등록일로부터 90일 동안 진행됩니다. 기간 내에 목표 서명 수를 달성하지 못하면 만료됩니다.',
       category: '서명 및 진행'
     },
     {
@@ -55,7 +55,7 @@ export const useFaqStore = create<FaqState>((set) => ({
     {
       id: '8',
       question: '부적절한 청원은 어떻게 신고하나요?',
-      answer: '각 청원 페이지 하단에 있는 신고 버튼을 통해 부적절한 내용을 신고할 수 있습니다.',
+      answer: '각 청원 페이지에 있는 신고 버튼을 통해 부적절한 내용을 신고할 수 있습니다.',
       category: '기타'
     }
   ],

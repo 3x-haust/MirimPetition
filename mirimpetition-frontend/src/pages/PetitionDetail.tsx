@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -55,7 +55,6 @@ const PetitionDetail = () => {
   const navigate = useNavigate();
   const { petitions, addSign, reportPetition, deletePetition, addComment, toggleCommentLike } =
     usePetitionStore();
-  const [hasSigned, setHasSigned] = useState(false);
   const [showSignConfirmation, setShowSignConfirmation] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showCommentDialog, setShowCommentDialog] = useState(false);
@@ -67,18 +66,13 @@ const PetitionDetail = () => {
 
   const petition = petitions.find((p) => p.id === id);
 
-  useEffect(() => {
-    setHasSigned(false);
-  }, [id]);
-
   if (!petition) {
     return <NotFound />;
   }
 
   const handleSign = (petition: Petition) => {
-    setHasSigned(true);
     setShowSignConfirmation(true);
-    addSign(petition.id!);
+    addSign(petition.id!, currentUser?.nickname || '익명');
     toast({
       title: '서명이 완료되었습니다',
       description: '청원에 동참해주셔서 감사합니다.',
@@ -528,18 +522,23 @@ const PetitionDetail = () => {
                   </div>
 
                   <div className="space-y-3">
-                    {petition.author.name !==
-                    currentUser?.nickname ? null : !hasSigned ? (
-                      <Button
-                        className="w-full"
-                        onClick={() => handleSign(petition)}
-                      >
-                        청원 서명하기
-                      </Button>
+                    {petition.author.name !== currentUser?.nickname ? (
+                      petition.signedBy?.includes(currentUser?.nickname || '') ? (
+                        <Button className="w-full" disabled>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          서명 완료
+                        </Button>
+                      ) : (
+                        <Button
+                          className="w-full"
+                          onClick={() => handleSign(petition)}
+                        >
+                          청원 서명하기
+                        </Button>
+                      )
                     ) : (
                       <Button className="w-full" disabled>
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        서명 완료
+                        본인 청원에는 서명할 수 없습니다
                       </Button>
                     )}
                     <Button
@@ -724,3 +723,4 @@ const PetitionDetail = () => {
 };
 
 export default PetitionDetail;
+

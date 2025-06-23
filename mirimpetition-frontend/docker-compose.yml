@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  react-app:
+    build: .
+    container_name: mirim_petition
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "${PORT:-2086}:${PORT:-2086}"
+    volumes:
+      - .:/app
+    command: yarn dev --host --port 2086

@@ -6,6 +6,7 @@ import { PetitionCard } from "@/components/PetitionCard";
 import { Layout } from "@/components/Layout";
 import { Link } from "react-router-dom";
 import { usePetitionStore } from "@/store/usePetitionStore";
+import { useMirimOAuth } from "mirim-oauth-react";
 
 const features = [
   {
@@ -36,6 +37,8 @@ const Index = () => {
     .sort((a, b) => (b.signatures ?? 0) - (a.signatures ?? 0))
     .slice(0, 4);
 
+  const { isLoggedIn, logIn } = useMirimOAuth();
+
   return (
     <Layout>
       <section className="relative pb-16">
@@ -65,9 +68,19 @@ const Index = () => {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Button asChild size="lg" className="text-lg px-8">
-              <Link to="/petitions/create">청원 작성하기</Link>
-            </Button>
+            {isLoggedIn ? (
+              <Button asChild size="lg" className="text-lg px-8">
+                <Link to="/petitions/create">청원 시작하기</Link>
+              </Button>
+            ) : (
+              <Button
+                size="lg"
+                className="text-lg px-8"
+                onClick={() => logIn()}
+              >
+                로그인하여 청원 시작하기
+              </Button>
+            )}
             <Button asChild size="lg" variant="outline" className="text-lg px-8">
               <Link to="/petitions">청원 둘러보기</Link>
             </Button>
@@ -144,3 +157,4 @@ const Index = () => {
 };
 
 export default Index;
+
